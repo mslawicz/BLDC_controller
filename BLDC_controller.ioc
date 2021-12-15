@@ -1,5 +1,6 @@
 #MicroXplorer Configuration settings - do not modify
 File.Version=6
+GPIO.groupedBy=Group By Peripherals
 KeepUserPlacement=false
 Mcu.Family=STM32F4
 Mcu.IP0=NVIC
@@ -43,6 +44,7 @@ NVIC.PendSV_IRQn=true\:0\:0\:false\:false\:true\:false\:false
 NVIC.PriorityGroup=NVIC_PRIORITYGROUP_0
 NVIC.SVCall_IRQn=true\:0\:0\:false\:false\:true\:false\:false
 NVIC.SysTick_IRQn=true\:0\:0\:true\:false\:true\:true\:true
+NVIC.TIM3_IRQn=true\:0\:0\:false\:false\:true\:true\:true
 NVIC.UsageFault_IRQn=true\:0\:0\:false\:false\:true\:true\:false
 PA13.GPIOParameters=GPIO_Label
 PA13.GPIO_Label=TMS
@@ -188,8 +190,8 @@ TIM3.CounterMode=TIM_COUNTERMODE_CENTERALIGNED1
 TIM3.IPParameters=Channel-PWM Generation1 CH1,Channel-PWM Generation3 CH3,Channel-PWM Generation4 CH4,Period,Pulse-PWM Generation1 CH1,Pulse-PWM Generation3 CH3,CounterMode,Pulse-PWM Generation4 CH4,Prescaler
 TIM3.Period=2000
 TIM3.Prescaler=0
-TIM3.Pulse-PWM\ Generation1\ CH1=100
-TIM3.Pulse-PWM\ Generation3\ CH3=500
+TIM3.Pulse-PWM\ Generation1\ CH1=500
+TIM3.Pulse-PWM\ Generation3\ CH3=100
 TIM3.Pulse-PWM\ Generation4\ CH4=1000
 USART2.IPParameters=VirtualMode
 USART2.VirtualMode=VM_ASYNC
