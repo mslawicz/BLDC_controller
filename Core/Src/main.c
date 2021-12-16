@@ -94,9 +94,12 @@ int main(void)
   /* USER CODE BEGIN 2 */
   uint32_t counter = 0;
 
-  HAL_TIM_PWM_Start_IT(&htim3, TIM_CHANNEL_1);
-  HAL_TIM_PWM_Start_IT(&htim3, TIM_CHANNEL_3);
-  HAL_TIM_PWM_Start_IT(&htim3, TIM_CHANNEL_4);
+  HAL_TIM_PWM_Start(&htim3, TIM_CHANNEL_1);
+  //channel 2 generates interrupts for ADC synchronization
+  //adjust channel 2 pulse width for generating interrupts in the middle of other pulses
+  HAL_TIM_PWM_Start_IT(&htim3, TIM_CHANNEL_2);
+  HAL_TIM_PWM_Start(&htim3, TIM_CHANNEL_3);
+  HAL_TIM_PWM_Start(&htim3, TIM_CHANNEL_4);
   /* USER CODE END 2 */
 
   /* Infinite loop */
@@ -212,6 +215,11 @@ static void MX_TIM3_Init(void)
   sConfigOC.OCPolarity = TIM_OCPOLARITY_HIGH;
   sConfigOC.OCFastMode = TIM_OCFAST_DISABLE;
   if (HAL_TIM_PWM_ConfigChannel(&htim3, &sConfigOC, TIM_CHANNEL_1) != HAL_OK)
+  {
+    Error_Handler();
+  }
+  sConfigOC.Pulse = 150;
+  if (HAL_TIM_PWM_ConfigChannel(&htim3, &sConfigOC, TIM_CHANNEL_2) != HAL_OK)
   {
     Error_Handler();
   }
