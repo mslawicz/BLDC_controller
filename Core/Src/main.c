@@ -114,6 +114,12 @@ int main(void)
 		  HAL_GPIO_TogglePin(LD2_GPIO_Port, LD2_Pin);
 	  }
 
+	  uint16_t pulse = (uint16_t)(counter >> 4);
+	  const uint16_t MaxPulse = 1800U;
+	  TIM3->CCR1 = pulse % MaxPulse;
+	  TIM3->CCR3 = (pulse + 500) % MaxPulse;
+	  TIM3->CCR4 = (pulse + 1000) % MaxPulse;
+
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
@@ -218,7 +224,7 @@ static void MX_TIM3_Init(void)
   {
     Error_Handler();
   }
-  sConfigOC.Pulse = 150;
+  sConfigOC.Pulse = 164;
   if (HAL_TIM_PWM_ConfigChannel(&htim3, &sConfigOC, TIM_CHANNEL_2) != HAL_OK)
   {
     Error_Handler();
