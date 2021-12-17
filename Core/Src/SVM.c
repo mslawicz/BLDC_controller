@@ -31,3 +31,44 @@ const int16_t SVM_value[] =
 	0x743D,0x7339,0x722A,0x710F,0x6FE9,
 	0x6EB8
 };
+
+const uint8_t SVM_size = sizeof(SVM_value) / sizeof(SVM_value[0]);
+
+//get SVM value
+//angle in degrees * 100
+int16_t getSVMvalue(int32_t angle)
+{
+	int8_t sign = 1;
+
+	//make angle >= 0
+	if(angle < 0)
+	{
+		angle = - angle;
+		sign = ~sign + 1;
+	}
+
+	//make angle < 360 degrees
+	angle %= 36000;
+
+	//make angle < 180 degrees
+	if(angle > 18000)
+	{
+		angle -= 18000;
+		sign = ~sign + 1;
+	}
+
+	//make angle < 90 degrees
+	if(angle > 9000)
+	{
+		angle = 18000 - angle;
+	}
+
+	uint8_t lowerIndex = angle / 100;
+
+	if(lowerIndex >= SVM_size - 1)
+	{
+		return sign * SVM_value[SVM_size - 1];
+	}
+
+	return sign * (SVM_value[lowerIndex] + (SVM_value[lowerIndex + 1] - SVM_value[lowerIndex]) * (angle % 100) / 100);
+}

@@ -109,7 +109,7 @@ int main(void)
 	  counter++;
 
 	  /* main loop heartbeat */
-	  if(counter % 500000 == 0)
+	  if(counter % 50000 == 0)
 	  {
 		  HAL_GPIO_TogglePin(LD2_GPIO_Port, LD2_Pin);
 	  }
@@ -119,6 +119,15 @@ int main(void)
 	  TIM3->CCR1 = pulse % MaxPulse;
 	  TIM3->CCR3 = (pulse + 500) % MaxPulse;
 	  TIM3->CCR4 = (pulse + 1000) % MaxPulse;
+
+	  int val;
+	  val = getSVMvalue(2000);
+	  val = getSVMvalue(6000);
+	  val = getSVMvalue(-6000);
+	  val = getSVMvalue(36000 + 6000);
+	  val = getSVMvalue(9000 + 2000);
+	  val = getSVMvalue(18000 + 1000);
+	  val = 0;
 
     /* USER CODE END WHILE */
 

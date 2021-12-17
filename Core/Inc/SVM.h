@@ -10,4 +10,6 @@
 
 #include "stm32f4xx_hal.h"
 
+int16_t getSVMvalue(int32_t angle);
+
 #endif /* INC_SVM_H_ */
