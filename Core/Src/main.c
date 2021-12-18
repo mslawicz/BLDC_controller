@@ -121,13 +121,8 @@ int main(void)
 	  TIM3->CCR4 = (pulse + 1000) % MaxPulse;
 
 	  int val;
-	  val = getSVMvalue(2000);
-	  val = getSVMvalue(6000);
-	  val = getSVMvalue(-6000);
-	  val = getSVMvalue(36000 + 6000);
-	  val = getSVMvalue(9000 + 2000);
-	  val = getSVMvalue(18000 + 1000);
-	  val = 0;
+	  val = getSVMvalue(counter % 36000);
+	  HAL_GPIO_TogglePin(Test_pin_GPIO_Port, Test_pin_Pin);
 
     /* USER CODE END WHILE */
 
@@ -334,7 +329,7 @@ static void MX_GPIO_Init(void)
 /* USER CODE BEGIN 4 */
 void HAL_TIM_PWM_PulseFinishedCallback(TIM_HandleTypeDef *htim)
 {
-	HAL_GPIO_TogglePin(Test_pin_GPIO_Port, Test_pin_Pin);
+	//HAL_GPIO_TogglePin(Test_pin_GPIO_Port, Test_pin_Pin);
 }
 /* USER CODE END 4 */
 
