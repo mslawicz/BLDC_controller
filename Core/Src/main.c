@@ -125,10 +125,16 @@ int main(void)
   {
 	  counter++;
 
+		// Get ADC value
+		HAL_ADC_Start(&hadc1);
+		HAL_ADC_PollForConversion(&hadc1, HAL_MAX_DELAY);
+		uint32_t raw = HAL_ADC_GetValue(&hadc1);
+
 	  /* main loop heartbeat */
 	  if(counter % 50000 == 0)
 	  {
 		  HAL_GPIO_TogglePin(LD2_GPIO_Port, LD2_Pin);
+		  printf("%u\r\n", raw);
 	  }
 
 	  uint32_t angle = (counter >> 4) % 36000;
