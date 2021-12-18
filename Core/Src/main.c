@@ -31,6 +31,7 @@
 
 /* Private define ------------------------------------------------------------*/
 /* USER CODE BEGIN PD */
+#define PWM_CHANNELS	3
 /* USER CODE END PD */
 
 /* Private macro -------------------------------------------------------------*/
@@ -45,6 +46,13 @@ UART_HandleTypeDef huart2;
 
 /* USER CODE BEGIN PV */
 
+//global variables for monitoring
+uint32_t g_PwmA;
+uint32_t g_PwmB;
+uint32_t g_PwmC;
+uint32_t g_PwmMid;
+
+uint32_t pwmValues[PWM_CHANNELS];
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -53,10 +61,7 @@ static void MX_GPIO_Init(void);
 static void MX_USART2_UART_Init(void);
 static void MX_TIM3_Init(void);
 /* USER CODE BEGIN PFP */
-uint32_t g_PwmA;
-uint32_t g_PwmB;
-uint32_t g_PwmC;
-uint32_t g_PwmMid;
+
 /* USER CODE END PFP */
 
 /* Private user code ---------------------------------------------------------*/
@@ -120,18 +125,14 @@ int main(void)
 	  }
 
 	  uint32_t angle = (counter >> 4) % 36000;
-	  uint32_t pwmA = ((getSVMvalue(angle) * PwmPeriod) >> 16) + (PwmPeriod >> 1);
-	  uint32_t pwmB = ((getSVMvalue(angle + 12000) * PwmPeriod) >> 16) + (PwmPeriod >> 1);
-	  uint32_t pwmC = ((getSVMvalue(angle + 24000) * PwmPeriod) >> 16) + (PwmPeriod >> 1);
+	  pwmValues[0] = ((getSVMvalue(angle) * PwmPeriod) >> 16) + (PwmPeriod >> 1);
+	  pwmValues[1] = ((getSVMvalue(angle + 12000) * PwmPeriod) >> 16) + (PwmPeriod >> 1);
+	  pwmValues[2] = ((getSVMvalue(angle + 24000) * PwmPeriod) >> 16) + (PwmPeriod >> 1);
 
-	  TIM3->CCR1 = pwmA;
-	  TIM3->CCR3 = pwmB;
-	  TIM3->CCR4 = pwmC;
-
-	  g_PwmA = pwmA;
-	  g_PwmB = pwmB;
-	  g_PwmC = pwmC;
-	  g_PwmMid = (pwmA + pwmB + pwmC) / 3;
+	  g_PwmA = pwmValues[0];
+	  g_PwmB = pwmValues[1];
+	  g_PwmC = pwmValues[2];
+	  g_PwmMid = (g_PwmA + g_PwmB + g_PwmC) / 3;
 
 	  HAL_GPIO_TogglePin(Test_pin_GPIO_Port, Test_pin_Pin);
 
@@ -340,7 +341,9 @@ static void MX_GPIO_Init(void)
 /* USER CODE BEGIN 4 */
 void HAL_TIM_PWM_PulseFinishedCallback(TIM_HandleTypeDef *htim)
 {
-	//HAL_GPIO_TogglePin(Test_pin_GPIO_Port, Test_pin_Pin);
+	TIM3->CCR1 = pwmValues[0];
+	TIM3->CCR3 = pwmValues[1];
+	TIM3->CCR4 = pwmValues[2];
 }
 /* USER CODE END 4 */
 
