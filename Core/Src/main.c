@@ -53,7 +53,10 @@ static void MX_GPIO_Init(void);
 static void MX_USART2_UART_Init(void);
 static void MX_TIM3_Init(void);
 /* USER CODE BEGIN PFP */
-
+uint32_t g_PwmA;
+uint32_t g_PwmB;
+uint32_t g_PwmC;
+uint32_t g_PwmMid;
 /* USER CODE END PFP */
 
 /* Private user code ---------------------------------------------------------*/
@@ -100,6 +103,8 @@ int main(void)
   HAL_TIM_PWM_Start_IT(&htim3, TIM_CHANNEL_2);
   HAL_TIM_PWM_Start(&htim3, TIM_CHANNEL_3);
   HAL_TIM_PWM_Start(&htim3, TIM_CHANNEL_4);
+
+  const int32_t PwmPeriod = htim3.Init.Period;
   /* USER CODE END 2 */
 
   /* Infinite loop */
@@ -114,14 +119,20 @@ int main(void)
 		  HAL_GPIO_TogglePin(LD2_GPIO_Port, LD2_Pin);
 	  }
 
-	  uint16_t pulse = (uint16_t)(counter >> 4);
-	  const uint16_t MaxPulse = 1800U;
-	  TIM3->CCR1 = pulse % MaxPulse;
-	  TIM3->CCR3 = (pulse + 500) % MaxPulse;
-	  TIM3->CCR4 = (pulse + 1000) % MaxPulse;
+	  uint32_t angle = (counter >> 4) % 36000;
+	  uint32_t pwmA = ((getSVMvalue(angle) * PwmPeriod) >> 16) + (PwmPeriod >> 1);
+	  uint32_t pwmB = ((getSVMvalue(angle + 12000) * PwmPeriod) >> 16) + (PwmPeriod >> 1);
+	  uint32_t pwmC = ((getSVMvalue(angle + 24000) * PwmPeriod) >> 16) + (PwmPeriod >> 1);
 
-	  int val;
-	  val = getSVMvalue(counter % 36000);
+	  TIM3->CCR1 = pwmA;
+	  TIM3->CCR3 = pwmB;
+	  TIM3->CCR4 = pwmC;
+
+	  g_PwmA = pwmA;
+	  g_PwmB = pwmB;
+	  g_PwmC = pwmC;
+	  g_PwmMid = (pwmA + pwmB + pwmC) / 3;
+
 	  HAL_GPIO_TogglePin(Test_pin_GPIO_Port, Test_pin_Pin);
 
     /* USER CODE END WHILE */
