@@ -33,7 +33,8 @@
 /* Private define ------------------------------------------------------------*/
 /* USER CODE BEGIN PD */
 #define PWM_CHANNELS	3
-#define ADC_CHANNELS	2
+#define ADC_CHANNELS	4
+#define ADC_MAX_12B		0xFFF
 /* USER CODE END PD */
 
 /* Private macro -------------------------------------------------------------*/
@@ -135,13 +136,13 @@ int main(void)
 	  if(counter % 50000 == 0)
 	  {
 		  HAL_GPIO_TogglePin(LD2_GPIO_Port, LD2_Pin);
-		  //printf("%u  %u\r\n", adcValues[0], adcValues[1]);
+		  printf("%u\r\n", adcValues[3]);
 	  }
 
 	  uint32_t angle = (counter >> 4) % 36000;
-	  pwmValues[0] = ((getSVMvalue(angle) * PwmPeriod) >> 16) + (PwmPeriod >> 1);
-	  pwmValues[1] = ((getSVMvalue(angle + 12000) * PwmPeriod) >> 16) + (PwmPeriod >> 1);
-	  pwmValues[2] = ((getSVMvalue(angle + 24000) * PwmPeriod) >> 16) + (PwmPeriod >> 1);
+	  pwmValues[0] = ((getSVMvalue(angle) * PwmPeriod) >> 16) * adcValues[3] / ADC_MAX_12B + (PwmPeriod >> 1);
+	  pwmValues[1] = ((getSVMvalue(angle + 12000) * PwmPeriod) >> 16) * adcValues[3] / ADC_MAX_12B + (PwmPeriod >> 1);
+	  pwmValues[2] = ((getSVMvalue(angle + 24000) * PwmPeriod) >> 16) * adcValues[3] / ADC_MAX_12B + (PwmPeriod >> 1);
 
 	  g_PwmA = pwmValues[0];
 	  g_PwmB = pwmValues[1];
@@ -230,7 +231,7 @@ static void MX_ADC1_Init(void)
   hadc1.Init.ExternalTrigConvEdge = ADC_EXTERNALTRIGCONVEDGE_NONE;
   hadc1.Init.ExternalTrigConv = ADC_SOFTWARE_START;
   hadc1.Init.DataAlign = ADC_DATAALIGN_RIGHT;
-  hadc1.Init.NbrOfConversion = 2;
+  hadc1.Init.NbrOfConversion = 4;
   hadc1.Init.DMAContinuousRequests = ENABLE;
   hadc1.Init.EOCSelection = ADC_EOC_SEQ_CONV;
   if (HAL_ADC_Init(&hadc1) != HAL_OK)
@@ -250,6 +251,22 @@ static void MX_ADC1_Init(void)
   */
   sConfig.Channel = ADC_CHANNEL_1;
   sConfig.Rank = 2;
+  if (HAL_ADC_ConfigChannel(&hadc1, &sConfig) != HAL_OK)
+  {
+    Error_Handler();
+  }
+  /** Configure for the selected ADC regular channel its corresponding rank in the sequencer and its sample time.
+  */
+  sConfig.Channel = ADC_CHANNEL_4;
+  sConfig.Rank = 3;
+  if (HAL_ADC_ConfigChannel(&hadc1, &sConfig) != HAL_OK)
+  {
+    Error_Handler();
+  }
+  /** Configure for the selected ADC regular channel its corresponding rank in the sequencer and its sample time.
+  */
+  sConfig.Channel = ADC_CHANNEL_14;
+  sConfig.Rank = 4;
   if (HAL_ADC_ConfigChannel(&hadc1, &sConfig) != HAL_OK)
   {
     Error_Handler();
