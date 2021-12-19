@@ -124,6 +124,8 @@ int main(void)
   const int32_t PwmPeriod = htim1.Init.Period;
 
   printf("BLDC controller v1.0\r\n");
+
+  HAL_GPIO_WritePin(motorEnable_GPIO_Port, motorEnable_Pin, GPIO_PIN_SET);
   /* USER CODE END 2 */
 
   /* Infinite loop */
@@ -433,12 +435,16 @@ static void MX_GPIO_Init(void)
   __HAL_RCC_GPIOH_CLK_ENABLE();
   __HAL_RCC_GPIOA_CLK_ENABLE();
   __HAL_RCC_GPIOB_CLK_ENABLE();
+  __HAL_RCC_GPIOD_CLK_ENABLE();
 
   /*Configure GPIO pin Output Level */
   HAL_GPIO_WritePin(LD2_GPIO_Port, LD2_Pin, GPIO_PIN_RESET);
 
   /*Configure GPIO pin Output Level */
   HAL_GPIO_WritePin(Test_pin_GPIO_Port, Test_pin_Pin, GPIO_PIN_RESET);
+
+  /*Configure GPIO pin Output Level */
+  HAL_GPIO_WritePin(motorEnable_GPIO_Port, motorEnable_Pin, GPIO_PIN_RESET);
 
   /*Configure GPIO pin : B1_Pin */
   GPIO_InitStruct.Pin = B1_Pin;
@@ -468,6 +474,17 @@ static void MX_GPIO_Init(void)
   GPIO_InitStruct.Alternate = GPIO_AF2_TIM3;
   HAL_GPIO_Init(GPIOC, &GPIO_InitStruct);
 
+  /*Configure GPIO pin : motorEnable_Pin */
+  GPIO_InitStruct.Pin = motorEnable_Pin;
+  GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
+  GPIO_InitStruct.Pull = GPIO_NOPULL;
+  GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
+  HAL_GPIO_Init(motorEnable_GPIO_Port, &GPIO_InitStruct);
+
+  /* EXTI interrupt init*/
+  HAL_NVIC_SetPriority(EXTI15_10_IRQn, 0, 0);
+  HAL_NVIC_EnableIRQ(EXTI15_10_IRQn);
+
 }
 
 /* USER CODE BEGIN 4 */
@@ -478,6 +495,16 @@ void HAL_TIM_PWM_PulseFinishedCallback(TIM_HandleTypeDef *htim)
 	TIM1->CCR3 = pwmValues[2];
 	HAL_ADC_Start_DMA(&hadc1, (uint32_t*)adcValues, ADC_CHANNELS);
 	HAL_GPIO_TogglePin(Test_pin_GPIO_Port, Test_pin_Pin);
+}
+
+//callback on GPIO EXTI interrupt
+void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin)
+{
+	if(GPIO_Pin == B1_Pin)
+	{
+		//panic button pressed
+		HAL_GPIO_WritePin(motorEnable_GPIO_Port, motorEnable_Pin, GPIO_PIN_RESET);
+	}
 }
 
 int _write(int file, char *ptr, int len)
